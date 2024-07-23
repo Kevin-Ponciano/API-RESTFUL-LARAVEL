@@ -32,7 +32,7 @@
                   </headerState>
                 </list>
               </option>
-              <option name="id" value="3377b01a-91dd-46b6-9efe-901f0d79c579" />
+              <option name="id" value="ccbd3de3-c206-4eee-a538-339a7b58d1f5" />
               <option name="method" value="POST" />
               <option name="name" value="store" />
               <option name="sortWeight" value="2000000" />
@@ -79,6 +79,57 @@
               <option name="name" value="update" />
               <option name="sortWeight" value="4000000" />
               <option name="url" value="{{url}}/10" />
+            </requestState>
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  email: &quot;test@test.com&quot;,&#10;  password: &quot;123&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Type" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="3377b01a-91dd-46b6-9efe-901f0d79c579" />
+              <option name="method" value="POST" />
+              <option name="name" value="login" />
+              <option name="sortWeight" value="5500000" />
+              <option name="url" value="http://localhost/api/v1/auth/login" />
+            </requestState>
+            <requestState>
+              <option name="auth">
+                <authState>
+                  <option name="bearer">
+                    <lg>
+                      <option name="token" value="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNzIxNzAwMDE5LCJleHAiOjE3MjE3MDM2MTksIm5iZiI6MTcyMTcwMDAxOSwianRpIjoiUElzME9hZE1KYmozQzlKbiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.Tf4Crbl0swLRdlRsultY3PQVoB0uk0jdShdO6_U4OHU" />
+                    </lg>
+                  </option>
+                  <option name="type" value="BEARER" />
+                </authState>
+              </option>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="disabled" value="true" />
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="89626493-3f29-44c1-a581-3fccec78877b" />
+              <option name="method" value="POST" />
+              <option name="name" value="me" />
+              <option name="sortWeight" value="6000000" />
+              <option name="url" value="http://localhost/api/v1/auth/me" />
             </requestState>
           </list>
         </option>

@@ -3,12 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\Book;
+use App\Trait\LoginForTest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BookStoreTest extends TestCase
 {
     use RefreshDatabase;
+    use LoginForTest; # Trait para autenticação do usuário
+
+    private string $url = '/api/v1/books';
 
     /**
      * Testa o sucesso ao armazenar um livro
@@ -16,10 +20,12 @@ class BookStoreTest extends TestCase
      */
     public function test_successfully_store_book()
     {
+        $this->loginForTest(); # autentica o usuário
+
         # Instancia do book, mas sem persistir no banco
         $book = Book::factory()->make()->toArray();
 
-        $response = $this->postJson('/api/v1/books', $book);
+        $response = $this->postJson($this->url, $book);
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -34,9 +40,11 @@ class BookStoreTest extends TestCase
 
     public function test_fail_to_store_book_title_is_null()
     {
+        $this->loginForTest(); # autentica o usuário
+
         $book = Book::factory()->make()->toArray();
         $book['title'] = "";
-        $response = $this->postJson('/api/v1/books', $book);
+        $response = $this->postJson($this->url, $book);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors('title')
@@ -49,12 +57,13 @@ class BookStoreTest extends TestCase
      *  Testa a falha ao armazenar um livro sem autor
      * e valida a mensagem de erro retornada
      */
-    public
-    function test_fail_to_store_book_without_author()
+    public function test_fail_to_store_book_without_author()
     {
+        $this->loginForTest(); # autentica o usuário
+
         $book = Book::factory()->make()->toArray();
         unset($book['author']);
-        $response = $this->postJson('/api/v1/books', $book);
+        $response = $this->postJson($this->url, $book);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors('author')
@@ -67,16 +76,33 @@ class BookStoreTest extends TestCase
      * Testa a falha ao armazenar um livro com ano de publicação no futuro
      * e valida a mensagem de erro retornada
      */
-    public
-    function test_fail_to_store_book_published_in_the_future()
+    public function test_fail_to_store_book_published_in_the_future()
     {
+        $this->loginForTest(); # autentica o usuário
+
         $book = Book::factory()->make(['publication_year' => '2025'])->toArray();
-        $response = $this->postJson('/api/v1/books', $book);
+        $response = $this->postJson($this->url, $book);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors('publication_year')
             ->assertJsonFragment([
                 'publication_year' => ['The publication year must be less than or equal to the current year.']
+            ]);
+    }
+
+    /**
+     * Testa a falha ao armazenar um livro sem autenticação
+     * e valida a mensagem de erro retornada
+     */
+
+    public function test_fail_to_store_book_without_authentication()
+    {
+        $book = Book::factory()->make()->toArray();
+        $response = $this->postJson($this->url, $book);
+
+        $response->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.'
             ]);
     }
 }

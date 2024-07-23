@@ -18,19 +18,20 @@ class BookController extends Controller
         }
         return response()->json([
             'message' => 'Books found',
-            'data' => BookResource::collection($books),
+            'data' => BookResource::collection($books), # Usado Usado Resource para formatar a resposta e evitar repetição e evitar repetição
         ]);
     }
 
     public function store(BookRequest $request)
     {
         try {
+            # Transação em conjunto com o try-catch para garantir a integridade dos dados
             DB::beginTransaction();
             $book = Book::create($request->validated());
             DB::commit();
             return response()->json([
                 'message' => 'Book created',
-                'data' => new BookResource($book),
+                'data' => new BookResource($book), # Usado Resource para formatar a resposta e evitar repetição
             ], 201);
         } catch (Exception $e) {
             DB::rollBack();
@@ -48,7 +49,7 @@ class BookController extends Controller
 
         return response()->json([
             'message' => 'Book found',
-            'data' => new BookResource($book),
+            'data' => new BookResource($book), # Usado Resource para formatar a resposta e evitar repetição
         ]);
     }
 
@@ -61,12 +62,13 @@ class BookController extends Controller
         }
 
         try {
+            # Transação em conjunto com o try-catch para garantir a integridade dos dados# Transação em conjunto com o try-catch para garantir a integridade dos dados
             DB::beginTransaction();
             $book->update($request->validated());
             DB::commit();
             return response()->json([
                 'message' => 'Book updated',
-                'data' => new BookResource($book),
+                'data' => new BookResource($book), # Usado Resource para formatar a resposta e evitar repetição
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -84,6 +86,7 @@ class BookController extends Controller
         }
 
         try {
+            # Transação em conjunto com o try-catch para garantir a integridade dos dados
             DB::beginTransaction();
             $book->delete();
             DB::commit();
