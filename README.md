@@ -22,7 +22,7 @@ Docker Compose instalados.
 1. Clone o repositório:
 
     ```bash
-    git clone https://github.com/Kevin-Ponciano/API-RESTFULL.git
+    git clone https://github.com/Kevin-Ponciano/API-RESTFUL-LARAVEL.git
     cd API-RESTFULL
     ```
 
