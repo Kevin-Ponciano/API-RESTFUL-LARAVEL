@@ -6,11 +6,21 @@
         <option name="requests">
           <list>
             <requestState>
+              <option name="auth">
+                <authState>
+                  <option name="bearer">
+                    <lt>
+                      <option name="token" value="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNzIxNzM4MTQwLCJleHAiOjE3MjE3NDE3NDAsIm5iZiI6MTcyMTczODE0MCwianRpIjoiTnpheWhIS2F5cjFPNmdyOSIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.NxHuR3D7A4ka0ulYoxj4ttY4PQzW_eduyRNCrS_9I0w" />
+                    </lt>
+                  </option>
+                  <option name="type" value="BEARER" />
+                </authState>
+              </option>
               <option name="id" value="3b6a2d27-2e09-4aae-803a-0879f4231690" />
               <option name="method" value="GET" />
               <option name="name" value="index" />
               <option name="sortWeight" value="1000000" />
-              <option name="url" value="{{url}}" />
+              <option name="url" value="http://localhost/api/v1/books" />
             </requestState>
             <requestState>
               <option name="body">
@@ -109,9 +119,9 @@
               <option name="auth">
                 <authState>
                   <option name="bearer">
-                    <lg>
+                    <lt>
                       <option name="token" value="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNzIxNzAwMDE5LCJleHAiOjE3MjE3MDM2MTksIm5iZiI6MTcyMTcwMDAxOSwianRpIjoiUElzME9hZE1KYmozQzlKbiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.Tf4Crbl0swLRdlRsultY3PQVoB0uk0jdShdO6_U4OHU" />
-                    </lg>
+                    </lt>
                   </option>
                   <option name="type" value="BEARER" />
                 </authState>
@@ -130,6 +140,41 @@
               <option name="name" value="me" />
               <option name="sortWeight" value="6000000" />
               <option name="url" value="http://localhost/api/v1/auth/me" />
+            </requestState>
+            <requestState>
+              <option name="auth">
+                <authState>
+                  <option name="bearer">
+                    <lt>
+                      <option name="token" value="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9hdXRoL2xvZ2luIiwiaWF0IjoxNzIxNzM4MTQwLCJleHAiOjE3MjE3NDE3NDAsIm5iZiI6MTcyMTczODE0MCwianRpIjoiTnpheWhIS2F5cjFPNmdyOSIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.NxHuR3D7A4ka0ulYoxj4ttY4PQzW_eduyRNCrS_9I0w" />
+                    </lt>
+                  </option>
+                  <option name="type" value="BEARER" />
+                </authState>
+              </option>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  email: &quot;test@test.com&quot;,&#10;  password: &quot;123&quot;&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Type" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="1a4a9d90-afd0-4e5c-bff4-c4e75815ce21" />
+              <option name="method" value="POST" />
+              <option name="name" value="logout" />
+              <option name="sortWeight" value="7000000" />
+              <option name="url" value="http://localhost/api/v1/auth/logout" />
             </requestState>
           </list>
         </option>

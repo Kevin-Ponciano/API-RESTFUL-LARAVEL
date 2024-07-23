@@ -114,6 +114,7 @@ class BookController extends Controller
         try {
             # Transação em conjunto com o try-catch para garantir a integridade dos dados
             DB::beginTransaction();
+            # Passa os dados validados para o método create, caso os dados não sejam válidos, uma exceção será lançada
             $book = Book::create($request->validated());
             DB::commit();
             return response()->json([

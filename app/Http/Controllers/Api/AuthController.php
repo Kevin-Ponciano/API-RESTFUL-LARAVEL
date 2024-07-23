@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Auth;
 use OpenApi\Annotations as OA;
 
 /**
@@ -26,15 +27,17 @@ class AuthController extends Controller
      *          @OA\JsonContent(
      *              required={"email","password"},
      *              @OA\Property(property="email", type="string", format="email", example="test@test.com"),
-     *         @OA\Property(property="password", type="string", format="password", example="123")
+     *              @OA\Property(property="password", type="string", format="password", example="123")
      *         ),
      *     ),
-     *     @OA\Response( response=200, description="Success", @OA\JsonContent(
-     *         @OA\Property(property="access_token", type="string", format="bearer", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI1IiwiaXNzIjoiYXBpLmNvbSIsImlhdCI6MTYxNzQwNzYwMCwiZXhwIjoxNjE3NDA3NjAwfQ"),
-     *     @OA\Property(property="token_type", type="string", example="bearer"),
-     *     @OA\Property(property="expires_in", type="integer", example="3600")
+     *     @OA\Response( response=200, description="Success",
+     *      @OA\JsonContent(
+     *          @OA\Property(property="access_token", type="string", format="bearer", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI1IiwiaXNzIjoiYXBpLmNvbSIsImlhdCI6MTYxNzQwNzYwMCwiZXhwIjoxNjE3NDA3NjAwfQ"),
+     *          @OA\Property(property="token_type", type="string", example="bearer"),
+     *          @OA\Property(property="expires_in", type="integer", example="3600")
      *    )),
-     *     @OA\Response( response=401, description="Unauthorized", @OA\JsonContent(
+     *     @OA\Response( response=401, description="Unauthorized",
+     *     @OA\JsonContent(
      *     @OA\Property(property="error", type="string", example="Unauthorized")
      *    )),
      * )
@@ -67,7 +70,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->logout(); # Esta é apenas uma função de logout que destruirá o token de acesso do usuário atual
+        auth()->logout(true); # Invalida o token atual do usuário
 
         return response()->json(['message' => 'Successfully logged out']);
     }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -34,6 +35,7 @@ class AuthTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure(['access_token', 'token_type', 'expires_in'])
             ->assertJson($response->json());
+        $this->assertTrue(Auth::check()); # Verifica se o usuário está autenticado
     }
 
     /*
@@ -60,6 +62,7 @@ class AuthTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'Successfully logged out']);
+        $this->assertFalse(Auth::check()); # Verifica se o usuário não está autenticado
     }
 
 
