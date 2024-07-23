@@ -2,9 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Book;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Database\Factories\BookFactory;
+use Hash;
 use Illuminate\Database\Seeder;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,8 +20,11 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'User Api',
+            'email' => 'user.api@test.com',
+            'password' => Hash::make('123'),
         ]);
+
+        Book::factory(100)->create();
     }
 }

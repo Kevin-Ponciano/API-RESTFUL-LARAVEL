@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JetClientState">
+    <option name="draftsState">
+      <draftsState>
+        <option name="requests">
+          <list>
+            <requestState>
+              <option name="id" value="3b6a2d27-2e09-4aae-803a-0879f4231690" />
+              <option name="method" value="GET" />
+              <option name="name" value="index" />
+              <option name="sortWeight" value="1000000" />
+              <option name="url" value="{{url}}" />
+            </requestState>
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  title: &quot;Livro Teste&quot;,&#10;  description: &quot;&quot;,&#10;  author: &quot;Kevin Ponciano&quot;,&#10;  //genre: &quot;Action&quot;,&#10;  publication_year: 2024,&#10;  pages: &quot;&quot;,&#10;  publisher: &quot;&quot;,&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="key" value="Content-Type" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                  <headerState>
+                    <option name="disabled" value="true" />
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="3377b01a-91dd-46b6-9efe-901f0d79c579" />
+              <option name="method" value="POST" />
+              <option name="name" value="store" />
+              <option name="sortWeight" value="2000000" />
+              <option name="url" value="{{url}}" />
+            </requestState>
+            <requestState>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="disabled" value="true" />
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="f929e839-c871-439a-a12b-0a8206f9189d" />
+              <option name="method" value="GET" />
+              <option name="name" value="show" />
+              <option name="sortWeight" value="3000000" />
+              <option name="url" value="{{url}}/1000" />
+            </requestState>
+            <requestState>
+              <option name="body">
+                <bodyState>
+                  <option name="raw" value="{&#10;  title: &quot;Livro Teste&quot;,&#10;  description: &quot;&quot;,&#10;  author: &quot;Kevin Ponciano&quot;,&#10;  genre: &quot;Action&quot;,&#10;  publication_year: 2024,&#10;  pages: &quot;&quot;,&#10;  publisher: &quot;&quot;,&#10;}" />
+                  <option name="type" value="JSON" />
+                </bodyState>
+              </option>
+              <option name="headers">
+                <list>
+                  <headerState>
+                    <option name="disabled" value="true" />
+                    <option name="key" value="Accept" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                  <headerState>
+                    <option name="key" value="Content-Type" />
+                    <option name="value" value="application/json" />
+                  </headerState>
+                </list>
+              </option>
+              <option name="id" value="7935d11f-7de9-4ed7-b72f-12b84c482bf6" />
+              <option name="method" value="PUT" />
+              <option name="name" value="update" />
+              <option name="sortWeight" value="4000000" />
+              <option name="url" value="{{url}}/10" />
+            </requestState>
+          </list>
+        </option>
+      </draftsState>
+    </option>
+    <option name="id" value="0513b60e-059b-46bc-a7d0-8420bd7ea8f7" />
+    <option name="version" value="3" />
+  </component>
+</project>
