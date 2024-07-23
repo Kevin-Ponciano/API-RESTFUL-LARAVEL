@@ -23,17 +23,21 @@ Docker Compose instalados.
 
     ```bash
     git clone https://github.com/Kevin-Ponciano/API-RESTFUL-LARAVEL.git
-    cd API-RESTFULL
+    cd API-RESTFUL-LARAVEL
     ```
 
 2. Instale as dependências:
 
-   > **Nota:** A pasta `vendor` já está no repositório para facilitar a instalação. Caso queira instalar as dependências
-   novamente, execute o comando abaixo:
+   > **Nota:** A pasta `vendor` já está no repositório para facilitar a instalação caso não tenha o Composer instalado.
+   > ```bash
+   > sudo chmod -R 700 vendor # Permissão para a pasta vendor
+   > ```
 
-    ```bash
-    composer install
-    ```
+   > **Nota:** Caso já tenha o Composer instalado, com php instalado, execute o comando abaixo:
+   > ```bash
+    > rm -rf vendor # Remove a pasta vendor
+    > composer install
+    > ```
 
 3. Copie o arquivo `.env.example` para `.env`:
 
@@ -60,7 +64,7 @@ Docker Compose instalados.
     sail artisan jwt:secret # Gera a chave do JWT
     ```
 
-7. Execute as migrations e seeders:
+7. Execute as migrations e seeders (só execute após a inicialização do conteiner mysql pra evitar erros):
 
     ```bash
     sail artisan migrate --seed
@@ -68,8 +72,8 @@ Docker Compose instalados.
 
 8. Acesse a aplicação:
 
-   A documentação da API estará disponível em [http://localhost/api/docs](http://localhost/api/docs). Nela, você poderá
-   testar a API e ver os endpoints disponíveis.
+   A documentação da API estará disponível em [http://localhost/api/docs](http://localhost/api/docs).   
+   Nela, você poderá testar a API e ver os endpoints disponíveis.
 
 ## Endpoints Disponíveis
 
