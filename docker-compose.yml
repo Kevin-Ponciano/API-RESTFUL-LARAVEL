@@ -1,31 +1,31 @@
-version: '3.9'
+version: "3.9"
 
 services:
-    laravel-app:
-        image: laravel-octane
-        build:
-            context: .
-            dockerfile: Dockerfile
-        networks:
-            - traefik_public
-        deploy:
-          placement:
-            constraints:
-              - node.labels.hostname == laravix
-            labels:
-                - "traefik.enable=true"
-                - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
-                - "traefik.http.services.laravel-app.loadbalancer.server.port=80"
-                - "traefik.http.routers.laravel-app.service=laravel-app"
-                - "traefik.http.routers.laravel-app.entrypoints=https"
-                - "traefik.http.routers.laravel-app.tls=true"
-            replicas: 1
-            resources:
-                reservations:
-                    cpus: "1"
-                    memory: 3G
-            restart_policy:
-                condition: on-failure
+  laravel-app:
+    image: laravel-octane
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - traefik_public
+    deploy:
+        placement:
+        constraints:
+            - node.labels.hostname == laravix
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
+            - "traefik.http.services.laravel-app.loadbalancer.server.port=80"
+            - "traefik.http.routers.laravel-app.service=laravel-app"
+            - "traefik.http.routers.laravel-app.entrypoints=https"
+            - "traefik.http.routers.laravel-app.tls=true"
+        replicas: 1
+        resources:
+            reservations:
+            cpus: "1"
+            memory: 3G
+        restart_policy:
+            condition: on-failure
 networks:
-    traefik_public:
-        external: true
+  traefik_public:
+    external: true
