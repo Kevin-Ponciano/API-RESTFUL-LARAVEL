@@ -10,8 +10,8 @@ services:
       - traefik_public
     deploy:
         placement:
-        constraints:
-            - node.labels.hostname == laravix
+            constraints:    
+                - node.labels.hostname == laravix
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
@@ -22,10 +22,11 @@ services:
         replicas: 1
         resources:
             reservations:
-              cpus: "1"
-              memory: 3G
+                cpus: "1"
+                memory: 3G
         restart_policy:
-            condition: on-failure
+            condition:
+             on-failure
 networks:
   traefik_public:
     external: true
