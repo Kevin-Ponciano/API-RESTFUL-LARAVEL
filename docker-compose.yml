@@ -9,24 +9,23 @@ services:
     networks:
       - traefik_public
     deploy:
-        placement:
-            constraints:
-              - node.labels.type == main
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
-            - "traefik.http.services.laravel-app.loadbalancer.server.port=80"
-            - "traefik.http.routers.laravel-app.service=laravel-app"
-            - "traefik.http.routers.laravel-app.entrypoints=https"
-            - "traefik.http.routers.laravel-app.tls=true"
-        replicas: 1
-        resources:
-            reservations:
-                cpus: "1"
-                memory: 3G
-        restart_policy:
-            condition:
-             on-failure
+      placement:
+        preferences:
+          - spread: node.labels.principal
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
+        - "traefik.http.services.laravel-app.loadbalancer.server.port=80"
+        - "traefik.http.routers.laravel-app.service=laravel-app"
+        - "traefik.http.routers.laravel-app.entrypoints=https"
+        - "traefik.http.routers.laravel-app.tls=true"
+      replicas: 1
+      resources:
+        reservations:
+          cpus: "1"
+          memory: 3G
+      restart_policy:
+        condition: on-failure
 networks:
   traefik_public:
     external: true
