@@ -3,6 +3,7 @@
 set -e  # Termina o script em caso de erro em qualquer comando
 
 REPOSITORY_PATH=~/repositories/API-RESTFUL-LARAVEL
+IMAGE_NAME="laravel-octane"
 STACK_NAME=API-RESTFUL-LARAVEL
 SERVICE_NAME=laravel-app
 SERVERS=("ubuntu@autonix-02" "ubuntu@autonix-03") # Adicione os servidores aqui
@@ -31,14 +32,12 @@ else
   echo "Tag de versão encontrada: $VERSION_BUILD"
 fi
 
-# Definir nome da imagem Docker e caminhos
-IMAGE_NAME="laravel-octane"
 IMAGE_NAME_TAG="$IMAGE_NAME:$VERSION_BUILD"
 OUTPUT_FILE="$IMAGE_NAME_TAG.tar"
 IMAGE_PATH=~/docker-images
 REMOTE_PATH=docker-images
 
-# Remove as imagens Docker locais existentes não utilizadas relacionadas à imagem atual
+# Sempre executar o build da imagem
 echo "Removendo imagens Docker locais não utilizadas relacionadas a $IMAGE_NAME..."
 docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | xargs -r docker rmi || { echo "Erro: Falha ao remover imagens Docker locais não utilizadas."; exit 1; }
 
@@ -46,57 +45,57 @@ docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | gre
 echo "Construindo a imagem Docker..."
 docker build -t $IMAGE_NAME_TAG . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
 
-# Atualizar o serviço Docker com a nova imagem
-echo "Atualizando o serviço Docker..."
-docker service update --force --image $IMAGE_NAME_TAG $STACK_NAME"_"$SERVICE_NAME || { echo "Erro: Falha ao atualizar o serviço Docker."; exit 1; }
 
-# Exportar a imagem Docker local para um arquivo tar
-echo "Exportando a imagem Docker local..."
-docker save -o "$IMAGE_PATH/$OUTPUT_FILE" "$IMAGE_NAME_TAG" || { echo "Erro: Falha ao exportar a imagem Docker."; exit 1; }
+# Checa se o parâmetro --new foi passado
+if [[ " $@ " =~ " --new " ]]; then
+    echo "Modo de criação de nova Stack selecionado: Removendo e recriando a Stack..."
 
-# Loop pelos servidores
-for SERVER in "${SERVERS[@]}"; do
-    echo "Transferindo a imagem Docker para o servidor remoto: $SERVER"
+    # Remover a stack existente
+    echo "Removendo a stack existente..."
+    docker stack rm $STACK_NAME || { echo "Erro ao remover a Stack."; exit 1; }
+    
+    sleep 5
 
-    # Verificar se a imagem com a tag específica já existe no servidor remoto
-    echo "Verificando se a imagem $IMAGE_NAME_TAG já existe no servidor remoto $SERVER..."
-    if ssh "$SERVER" "docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '$IMAGE_NAME_TAG'"; then
-        echo "A imagem $IMAGE_NAME_TAG já existe no servidor remoto $SERVER. Pulando a transferência e o carregamento."
-    else
-        # Criar o diretório remoto se não existir
+    # Criar a nova stack
+    echo "Criando nova Stack..."
+    docker stack deploy -c docker-compose.yml $STACK_NAME || { echo "Erro ao criar a nova Stack."; exit 1; }
+
+    echo "Nova Stack criada com sucesso."
+else
+    # Atualizar o serviço Docker com a nova imagem
+    echo "Atualizando o serviço Docker..."
+    docker service update --force --image $IMAGE_NAME_TAG $STACK_NAME"_"$SERVICE_NAME || { echo "Erro: Falha ao atualizar o serviço Docker."; exit 1; }
+fi
+
+# Checa se o parâmetro --sync foi passado
+if [[ " $@ " =~ " --sync " ]]; then
+    echo "Modo de sincronização selecionado: Exportando e sincronizando imagem Docker..."
+    
+    # Exportar e sincronizar a imagem Docker para os servidores remotos
+    echo "Exportando a imagem Docker local..."
+    docker save -o "$IMAGE_PATH/$OUTPUT_FILE" "$IMAGE_NAME_TAG" || { echo "Erro: Falha ao exportar a imagem Docker."; exit 1; }
+
+    # Loop pelos servidores para transferir e carregar a imagem
+    for SERVER in "${SERVERS[@]}"; do
+        echo "Transferindo a imagem Docker para o servidor remoto: $SERVER"
         ssh "$SERVER" "mkdir -p $REMOTE_PATH" || { echo "Erro: Não foi possível criar o diretório $REMOTE_PATH no servidor $SERVER."; exit 1; }
-        
-        # Transferir o arquivo tar para o servidor remoto via SCP
-        echo "Imagem $IMAGE_NAME_TAG não encontrada no servidor $SERVER. Transferindo o arquivo .tar..."
         scp "$IMAGE_PATH/$OUTPUT_FILE" "$SERVER:$REMOTE_PATH" || { echo "Erro: Falha ao transferir o arquivo tar para $SERVER."; exit 1; }
-        
-        # Conectar ao servidor remoto via SSH e carregar a imagem Docker
-        echo "Conectando ao servidor remoto: $SERVER para carregar a imagem Docker..."
         ssh "$SERVER" << EOF
-            set -e  # Encerra a execução no servidor remoto caso algum erro ocorra
-            
-            # Remover as imagens Docker locais existentes não utilizadas relacionadas à imagem atual
-            echo "Removendo imagens Docker locais não utilizadas relacionadas a $IMAGE_NAME..."
-            docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | xargs -r docker rmi || { echo "Erro: Falha ao remover imagens Docker locais não utilizadas."; exit 1; }
-
-            echo "Carregando a imagem Docker no servidor remoto: $SERVER"
-            docker load -i "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao carregar a imagem Docker no servidor remoto: $SERVER"; exit 1; }
-            
-            echo "Removendo o arquivo temporário no servidor remoto: $SERVER"
-            rm "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao remover o arquivo temporário no servidor remoto: $SERVER"; exit 1; }
-            echo "Arquivo temporário removido no servidor remoto: $SERVER"
+            set -e
+            docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | xargs -r docker rmi || { echo "Erro: Falha ao remover imagens Docker."; exit 1; }
+            docker load -i "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao carregar a imagem Docker no servidor remoto."; exit 1; }
+            rm "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao remover o arquivo temporário no servidor."; exit 1; }
 EOF
+    done
 
-        echo "Imagem carregada e arquivo removido no servidor remoto: $SERVER"
-    fi
-done
+    echo "Sincronização concluída com sucesso."
 
-# Remover o arquivo tar local
-echo "Removendo o arquivo tar local..."
-rm "$IMAGE_PATH/$OUTPUT_FILE" || { echo "Erro: Falha ao remover o arquivo tar local."; exit 1; }
+    echo "Removendo o arquivo tar local..."
+    rm "$IMAGE_PATH/$OUTPUT_FILE" || { echo "Erro: Falha ao remover o arquivo tar local."; exit 1; }
+fi
 
 # Opcional: Remover a chave SSH do agente
 echo "Removendo a chave SSH do agente..."
 ssh-add -d $SSH_KEY_PATH || { echo "Erro: Falha ao remover a chave SSH do agente."; exit 1; }
 
-echo "Processo concluído com sucesso em todos os servidores."
+echo "Processo concluído com sucesso."
