@@ -10,8 +10,8 @@ services:
       - traefik_public
     deploy:
         placement:
-            constraints:    
-                - node.labels.type == main
+            constraints:
+              - node.labels.type == main
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.laravel-app.rule=Host(`app.laravix.com.br`)"
