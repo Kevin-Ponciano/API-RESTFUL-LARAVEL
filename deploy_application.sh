@@ -10,6 +10,9 @@ SERVERS=("ubuntu@autonix-02" "ubuntu@autonix-03") # Adicione os servidores aqui
 SSH_KEY_PATH=~/.ssh/github_deploy
 BRANCH=main
 
+# Variável para armazenar erros
+ERRORS=""
+
 # Adicionar a chave SSH ao agente SSH
 echo "Adicionando a chave SSH ao agente SSH..."
 eval "$(ssh-agent -s)"
@@ -71,30 +74,56 @@ else
     docker service update --force --image $IMAGE_NAME_TAG $STACK_NAME"_"$SERVICE_NAME || { echo "Erro: Falha ao atualizar o serviço Docker."; exit 1; }
 fi
 
+# Função para processar cada servidor
+process_server() {
+    local SERVER=$1
+
+    echo "Processando o servidor: $SERVER"
+    
+    ssh "$SERVER" "mkdir -p $REMOTE_PATH" || { ERRORS="$ERRORS\nFalha ao criar diretório em $SERVER"; return; }
+
+    # Verifica se a imagem com a tag já existe no servidor e remove
+    IMAGE_EXISTS=$(ssh "$SERVER" "docker images -q $IMAGE_NAME_TAG")
+    if [ -n "$IMAGE_EXISTS" ]; then
+        echo "A imagem $IMAGE_NAME_TAG já existe no servidor $SERVER. Removendo..."
+        ssh "$SERVER" "docker rmi -f $IMAGE_NAME_TAG" || { ERRORS="$ERRORS\nFalha ao remover imagem em $SERVER"; return; }
+    fi
+
+    # Transferir a imagem Docker
+    echo "Transferindo a imagem Docker para o servidor remoto: $SERVER"
+    scp "$IMAGE_PATH/$OUTPUT_FILE" "$SERVER:$REMOTE_PATH" || { ERRORS="$ERRORS\nFalha ao transferir o arquivo tar para $SERVER"; return; }
+
+    # Carregar a imagem no servidor remoto
+    ssh "$SERVER" << EOF
+        set -e
+        docker load -i "$REMOTE_PATH/$OUTPUT_FILE" || { exit 1; }
+        docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST || { exit 1; }
+        rm "$REMOTE_PATH/$OUTPUT_FILE"
+EOF
+    if [ $? -ne 0 ]; then
+        ERRORS="$ERRORS\nErro ao carregar a imagem no servidor $SERVER"
+    else
+        echo "Imagem carregada com sucesso no servidor $SERVER"
+    fi
+}
+
 # Checa se o parâmetro --sync foi passado
 if [[ " $@ " =~ " --sync " ]]; then
     echo "Modo de sincronização selecionado: Exportando e sincronizando imagem Docker..."
     
-    # Exportar e sincronizar a imagem Docker para os servidores remotos
+    # Exportar a imagem Docker local
     echo "Exportando a imagem Docker local..."
     docker save -o "$IMAGE_PATH/$OUTPUT_FILE" "$IMAGE_NAME_TAG" || { echo "Erro: Falha ao exportar a imagem Docker."; exit 1; }
 
-    # Loop pelos servidores para transferir e carregar a imagem
+    # Loop pelos servidores
     for SERVER in "${SERVERS[@]}"; do
-        echo "Transferindo a imagem Docker para o servidor remoto: $SERVER"
-        ssh "$SERVER" "mkdir -p $REMOTE_PATH" || { echo "Erro: Não foi possível criar o diretório $REMOTE_PATH no servidor $SERVER."; exit 1; }
-        scp "$IMAGE_PATH/$OUTPUT_FILE" "$SERVER:$REMOTE_PATH" || { echo "Erro: Falha ao transferir o arquivo tar para $SERVER."; exit 1; }
-        ssh "$SERVER" << EOF
-            set -e
-            docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | xargs -r docker rmi || { echo "Erro: Falha ao remover imagens Docker."; exit 1; }
-            docker load -i "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao carregar a imagem Docker no servidor remoto."; exit 1; }
-            docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST || { echo "Erro: Falha ao adicionar a tag latest à imagem Docker."; exit 1; }
-            rm "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao remover o arquivo temporário no servidor."; exit 1; }
-EOF
+        process_server "$SERVER" &
     done
 
-    echo "Sincronização concluída com sucesso."
+    # Aguarda todos os processos finalizarem
+    wait
 
+    # Remove o arquivo tar local
     echo "Removendo o arquivo tar local..."
     rm "$IMAGE_PATH/$OUTPUT_FILE" || { echo "Erro: Falha ao remover o arquivo tar local."; exit 1; }
 fi
@@ -103,4 +132,9 @@ fi
 echo "Removendo a chave SSH do agente..."
 ssh-add -d $SSH_KEY_PATH || { echo "Erro: Falha ao remover a chave SSH do agente."; exit 1; }
 
-echo "Processo concluído com sucesso."
+# Exibe erros se houver
+if [ -n "$ERRORS" ]; then
+    echo -e "Erros encontrados durante o processo:$ERRORS"
+else
+    echo "Processo concluído com sucesso."
+fi
