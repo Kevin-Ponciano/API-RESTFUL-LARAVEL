@@ -44,7 +44,8 @@ docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | gre
 
 # Construir a imagem Docker
 echo "Construindo a imagem Docker..."
-docker build -t $IMAGE_NAME_TAG -t $IMAGE_NAME_LATEST . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
+docker build -t $IMAGE_NAME_TAG . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
+docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST
 
 
 # Checa se o parâmetro --new foi passado
