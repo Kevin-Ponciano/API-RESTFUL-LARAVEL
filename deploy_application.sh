@@ -45,7 +45,9 @@ docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | gre
 # Construir a imagem Docker
 echo "Construindo a imagem Docker..."
 docker build -t $IMAGE_NAME_TAG . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
-docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST
+echo "Imagem Docker construída com sucesso."
+docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST || { echo "Erro: Falha ao adicionar a tag latest à imagem Docker."; exit 1; }
+echo "Tag latest adicionada à imagem Docker."
 
 
 # Checa se o parâmetro --new foi passado
@@ -86,6 +88,7 @@ if [[ " $@ " =~ " --sync " ]]; then
             set -e
             docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | grep "$IMAGE_NAME" | xargs -r docker rmi || { echo "Erro: Falha ao remover imagens Docker."; exit 1; }
             docker load -i "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao carregar a imagem Docker no servidor remoto."; exit 1; }
+            docker tag $IMAGE_NAME_TAG $IMAGE_NAME_LATEST || { echo "Erro: Falha ao adicionar a tag latest à imagem Docker."; exit 1; }
             rm "$REMOTE_PATH/$OUTPUT_FILE" || { echo "Erro ao remover o arquivo temporário no servidor."; exit 1; }
 EOF
     done
