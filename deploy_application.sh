@@ -33,6 +33,7 @@ else
 fi
 
 IMAGE_NAME_TAG="$IMAGE_NAME:$VERSION_BUILD"
+IMAGE_NAME_LATEST="$IMAGE_NAME:latest"
 OUTPUT_FILE="$IMAGE_NAME_TAG.tar"
 IMAGE_PATH=~/docker-images
 REMOTE_PATH=docker-images
@@ -43,7 +44,7 @@ docker images --filter "dangling=true" --format "{{.Repository}}:{{.Tag}}" | gre
 
 # Construir a imagem Docker
 echo "Construindo a imagem Docker..."
-docker build -t $IMAGE_NAME_TAG . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
+docker build -t $IMAGE_NAME_TAG -t $IMAGE_NAME_LATEST . || { echo "Erro: Falha ao construir a imagem Docker."; exit 1; }
 
 
 # Checa se o parâmetro --new foi passado
