@@ -1,20 +1,25 @@
 #!/bin/bash
 
+# Exemplo de uso:
+#./deploy_application.sh laravel-octane API-RESTFUL-LARAVEL laravel-app ~/.ssh/github_deploy "ubuntu@autonix-02,ubuntu@autonix-03" --new
+
 set -e  # Termina o script em caso de erro em qualquer comando
 
 # Verifica se o número mínimo de argumentos foi passado
-if [ $# -lt 5 ]; then
+if [ $# -lt 4 ]; then
     echo "Erro: Parâmetros insuficientes."
-    echo "Uso: $0 <image_name> <stack_name> <service_name> <servers> <ssh_key_path> [repository_path] [branch]"
+    echo "Uso: $0 <image_name> <stack_name> <service_name> <ssh_key_path> [servers] [repository_path] [branch] [--new]"
     echo "Parâmetros obrigatórios:"
     echo "  image_name       Nome da imagem Docker"
     echo "  stack_name       Nome do stack Docker"
     echo "  service_name     Nome do serviço Docker"
-    echo "  servers          Lista de servidores (formato: usuario@servidor) separados por vírgula"
     echo "  ssh_key_path     Caminho para a chave SSH para autenticação no repositório Git"
     echo "Parâmetros opcionais:"
+    echo "  servers          Lista de servidores (formato: usuario@servidor) separados por vírgula"
     echo "  repository_path  Caminho para o repositório (padrão: diretório atual)"
     echo "  branch           Branch do repositório Git (padrão: main)"
+    echo "Opções:"
+    echo "  --new            Remove e recria a Stack Docker"
     exit 1
 fi
 
@@ -22,10 +27,10 @@ fi
 IMAGE_NAME="$1"
 STACK_NAME="$2"
 SERVICE_NAME="$3"
-IFS=',' read -r -a SERVERS <<< "$4"  # Converte a lista de servidores em um array
-SSH_KEY_PATH="$5"
+SSH_KEY_PATH="$4"
 
 # Parâmetros opcionais
+IFS=',' read -r -a SERVERS <<< "$5"  # Converte a lista de servidores em um array
 REPOSITORY_PATH="${6:-$(pwd)}"  # Se não passar, pega o path atual
 BRANCH="${7:-main}"  # Se não passar, assume "main"
 
@@ -34,8 +39,8 @@ echo "Variáveis configuradas:"
 echo "  IMAGE_NAME: $IMAGE_NAME"
 echo "  STACK_NAME: $STACK_NAME"
 echo "  SERVICE_NAME: $SERVICE_NAME"
-echo "  SERVERS: ${SERVERS[*]}"
 echo "  SSH_KEY_PATH: $SSH_KEY_PATH"
+echo "  SERVERS: ${SERVERS[*]}"
 echo "  REPOSITORY_PATH: $REPOSITORY_PATH"
 echo "  BRANCH: $BRANCH"
 
@@ -136,8 +141,8 @@ EOF
     fi
 }
 
-# Checa se o parâmetro --sync foi passado
-if [[ " $@ " =~ " --sync " ]]; then
+# Sincronizar a imagem Docker com os servidores caso tenha sido passado os servidores
+if [ ${#SERVERS[@]} -gt 0 ]; then
     echo "Modo de sincronização selecionado: Exportando e sincronizando imagem Docker..."
     
     # Exportar a imagem Docker local
