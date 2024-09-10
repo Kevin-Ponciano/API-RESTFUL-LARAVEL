@@ -27,7 +27,7 @@ git fetch && git checkout $BRANCH && git pull || { echo "Erro: Falha ao atualiza
 
 # Obter a última tag do repositório
 echo "Obtendo a última tag do repositório..."
-VERSION_BUILD=$(git tag | tail -n 1)
+VERSION_BUILD=$(git tag | grep -E '^v[0-9]+' | tail -n 1)
 if [ -z "$VERSION_BUILD" ]; then
   echo "Erro: Nenhuma tag de versão encontrada. Cancelando pipeline."
   exit 1
